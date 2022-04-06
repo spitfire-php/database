@@ -234,12 +234,15 @@ class Query
 	public function selectAll(TableIdentifierInterface $table = null) : Collection
 	{
 		$_t = $table !== null? $table : $this->from->output();
-		$this->calculated->add($_t->getOutputs()->each(function (IdentifierInterface $f) : SelectExpression {
+		
+		$add = $_t->getOutputs()->each(function (IdentifierInterface $f) : SelectExpression {
 			return new SelectExpression($f);
-		}));
+		});
+		
+		$this->calculated->add($add);
 		
 		assert($this->calculated->containsOnly(SelectExpression::class));
-		return clone $this->calculated;
+		return $add;
 	}
 	
 	public function select(string $name, string $alias = null) : SelectExpression
