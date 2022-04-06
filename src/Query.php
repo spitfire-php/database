@@ -229,9 +229,9 @@ class Query
 	 * passed).
 	 *
 	 * @param TableIdentifierInterface $table
-	 * @return Query
+	 * @return Collection<SelectExpression>
 	 */
-	public function selectAll(TableIdentifierInterface $table = null) : Query
+	public function selectAll(TableIdentifierInterface $table = null) : Collection
 	{
 		$_t = $table !== null? $table : $this->from->output();
 		$this->calculated->add($_t->getOutputs()->each(function (IdentifierInterface $f) : SelectExpression {
@@ -239,15 +239,24 @@ class Query
 		}));
 		
 		assert($this->calculated->containsOnly(SelectExpression::class));
-		return $this;
+		return clone $this->calculated;
 	}
 	
-	public function select(string $name, TableIdentifierInterface $table = null) : Query
+	public function select(string $name, string $alias = null) : SelectExpression
 	{
-		$field = ($table?: $this->from->output())->getOutput($name);
-		$this->calculated->push(new SelectExpression($field));
+		$field = $this->from->output()->getOutput($name);
+		$expression = new SelectExpression($field, $alias);
+		$this->calculated->push($expression);
 		assert($this->calculated->containsOnly(SelectExpression::class));
-		return $this;
+		return $expression;
+	}
+	
+	public function selectField(FieldIdentifier $field, string $alias = null) : SelectExpression
+	{
+		$expression = new SelectExpression($field, $alias);
+		$this->calculated->push($expression);
+		assert($this->calculated->containsOnly(SelectExpression::class));
+		return $expression;
 	}
 	
 	/**
