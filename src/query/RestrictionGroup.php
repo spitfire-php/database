@@ -5,6 +5,8 @@ use InvalidArgumentException;
 use spitfire\collection\Collection;
 use spitfire\exceptions\ApplicationException;
 use spitfire\storage\database\identifiers\IdentifierInterface;
+use spitfire\storage\database\identifiers\TableIdentifier;
+use spitfire\storage\database\Query;
 
 /**
  * A restriction group contains a set of restrictions (or restriction groups)
@@ -31,15 +33,17 @@ class RestrictionGroup extends Collection implements RestrictionInterface
 	private $type = self::TYPE_AND;
 	
 	/**
-	 * The negated flag allows the application to maintain a state on the restriction
-	 * group. Negating these groups is expensive, since we have to descend into the
-	 * children and rewrite a lot of stuff.
+	 * The table allows us to maintain a lst of available fields for the restriction group,
+	 * making functions like whereExists available.
 	 *
-	 * Instead we maintaing the state and flip the group only when and if needed.
-	 *
-	 * @var bool
+	 * @var TableIdentifier
 	 */
-	private $negated = false;
+	private $table;
+	
+	public function __construct(TableIdentifier $table)
+	{
+		$this->table = $table;
+	}
 	
 	/**
 	 * Adds a restriction to the current query. Restraining the data a field
@@ -70,6 +74,24 @@ class RestrictionGroup extends Collection implements RestrictionInterface
 		
 		
 		$this->push(new Restriction($field, $operator, $value));
+		return $this;
+	}
+	
+	/**
+	 * Adds a restriction to the current query. Restraining the data a field
+	 * in it can contain.
+	 *
+	 * @see  http://www.spitfirephp.com/wiki/index.php/Method:spitfire/storage/database/Query::addRestriction
+	 *
+	 * @param Closure $generator
+	 * @return RestrictionGroup
+	 */
+	public function whereExists(Closure $generator) : RestrictionGroup
+	{
+		$value = $generator($this->table);
+		assert($value instanceof Query);
+		
+		$this->push(new Restriction(null, Restriction::EQUAL_OPERATOR, $value));
 		return $this;
 	}
 	
