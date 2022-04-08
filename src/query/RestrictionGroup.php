@@ -102,7 +102,7 @@ class RestrictionGroup extends Collection implements RestrictionInterface
 	public function group($type = self::TYPE_OR) : RestrictionGroup
 	{
 		#Create the group and set the type we need
-		$group = new RestrictionGroup();
+		$group = new RestrictionGroup($this->table);
 		$group->setType($type);
 		
 		#Add it to our restriction list
