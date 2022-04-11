@@ -40,7 +40,7 @@ class MySQLQuoter implements QuoterInterface
 		$this->pdo = $pdo;
 	}
 	
-	public function quote(string $str = null): string
+	public function quote(string $str): string
 	{
 		return $this->pdo->quote($str);
 	}

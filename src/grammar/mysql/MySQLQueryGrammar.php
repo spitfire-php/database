@@ -155,7 +155,6 @@ class MySQLQueryGrammar
 			if ($r instanceof Restriction) {
 				return $this->restriction($r);
 			}
-				throw new ApplicationException('Impossible condition');
 		})
 			->join($restrictions->getType() === RestrictionGroup::TYPE_AND? ' AND ' : ' OR ');
 		;

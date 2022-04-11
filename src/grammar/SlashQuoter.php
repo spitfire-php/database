@@ -33,7 +33,7 @@ use spitfire\storage\database\QuoterInterface;
 class SlashQuoter implements QuoterInterface
 {
 	
-	public function quote(string $str = null): string
+	public function quote(string $str): string
 	{
 		return sprintf("'%s'", addslashes($str));
 	}

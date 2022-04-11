@@ -42,5 +42,5 @@ interface QuoterInterface
 	 * 
 	 * @see PDO::quote
 	 */
-	function quote(string $str = null): string;
+	function quote(string $str): string;
 }

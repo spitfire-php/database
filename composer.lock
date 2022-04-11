@@ -243,7 +243,7 @@
             "version": "v0.1.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/spitfire-php/exceptions.git",
+                "url": "https://phabricator.magic3w.com/source/spitfire-exception.git",
                 "reference": "02b1d64efe48d8a379013cd341e7865c0768779f"
             },
             "require-dev": {
@@ -2630,5 +2630,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.2.0"
 }
