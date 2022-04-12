@@ -4,8 +4,7 @@ use Closure;
 use InvalidArgumentException;
 use spitfire\collection\Collection;
 use spitfire\exceptions\ApplicationException;
-use spitfire\storage\database\identifiers\IdentifierInterface;
-use spitfire\storage\database\identifiers\TableIdentifier;
+use spitfire\storage\database\identifiers\TableIdentifierInterface;
 use spitfire\storage\database\Query;
 
 /**
@@ -36,11 +35,11 @@ class RestrictionGroup extends Collection implements RestrictionInterface
 	 * The table allows us to maintain a lst of available fields for the restriction group,
 	 * making functions like whereExists available.
 	 *
-	 * @var TableIdentifier
+	 * @var TableIdentifierInterface
 	 */
 	private $table;
 	
-	public function __construct(TableIdentifier $table)
+	public function __construct(TableIdentifierInterface $table)
 	{
 		$this->table = $table;
 	}
@@ -51,7 +50,7 @@ class RestrictionGroup extends Collection implements RestrictionInterface
 	 *
 	 * @see  http://www.spitfirephp.com/wiki/index.php/Method:spitfire/storage/database/Query::addRestriction
 	 *
-	 * @param IdentifierInterface $field
+	 * @param string $field
 	 * @param mixed  $value
 	 * @param string $_
 	 * @return RestrictionGroup
@@ -73,7 +72,7 @@ class RestrictionGroup extends Collection implements RestrictionInterface
 		}
 		
 		
-		$this->push(new Restriction($field, $operator, $value));
+		$this->push(new Restriction($this->table->getOutput($field), $operator, $value));
 		return $this;
 	}
 	
@@ -131,33 +130,4 @@ class RestrictionGroup extends Collection implements RestrictionInterface
 		return $this->type;
 	}
 	
-	public function negate() : RestrictionGroup
-	{
-		$this->negated = !$this->negated;
-		return $this;
-	}
-	
-	/**
-	 * When a restriction group is flipped, the system will change the type from
-	 * AND to OR and viceversa. When doing so, all the restrictions are negated.
-	 *
-	 * This means that <code>$a == $a->flip()</code> even though they have inverted
-	 * types. This is specially interesting for query optimization and negation.
-	 *
-	 * @return RestrictionGroup
-	 */
-	public function flip() : RestrictionGroup
-	{
-		$this->negated = !$this->negated;
-		$this->type = $this->type === self::TYPE_AND? self::TYPE_OR : self::TYPE_AND;
-		
-		foreach ($this as $restriction) {
-			if ($restriction instanceof Restriction ||
-				$restriction instanceof RestrictionGroup) {
-				$restriction->negate();
-			}
-		}
-		
-		return $this;
-	}
 }
