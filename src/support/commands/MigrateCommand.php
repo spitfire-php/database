@@ -9,7 +9,7 @@ class MigrateCommand extends Director
 {
 	
 	/**
-	 * 
+	 *
 	 * @var Connection
 	 */
 	private $connection;
@@ -29,9 +29,7 @@ class MigrateCommand extends Director
 	public function exec(array $parameters, CLIParameters $arguments): int
 	{
 		foreach	($this->migrations as $migration) {
-			
-			if (!$this->connection->contains($migration))
-			{
+			if (!$this->connection->contains($migration)) {
 				$instance = new $migration();
 				assert($instance instanceof MigrationOperationInterface);
 				$instance->up($this->connection->getDriver()->getMigrationExecutor($this->connection->getSchema()));
@@ -40,5 +38,4 @@ class MigrateCommand extends Director
 		
 		return 0;
 	}
-	
 }

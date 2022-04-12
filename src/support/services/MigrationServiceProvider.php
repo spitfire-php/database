@@ -8,12 +8,19 @@ use spitfire\storage\database\support\commands\MigrateCommand;
 
 class MigrationServiceProvider extends Provider
 {
-	
+
+	/**
+	 * 
+	 * @return void
+	 */	
 	public function register()
 	{
-		
 	}
 	
+	/**
+	 * 
+	 * @return void
+	 */
 	public function init()
 	{
 		if (cli()) {
@@ -24,7 +31,7 @@ class MigrationServiceProvider extends Provider
 			 * from the migrations manifest file which should contain an array
 			 * of migrations to be performed to maintain the application at a
 			 * modern state.
-			 * 
+			 *
 			 * Please note that the order in which the migrations appear in the
 			 * manifest file is relevant to the order in which they are applied
 			 * and rolled back.
@@ -35,7 +42,7 @@ class MigrationServiceProvider extends Provider
 			 * If there is no manifest, there is no way to consistently apply
 			 * the migrations.
 			 */
-			if(!file_exists($file)) {
+			if (!file_exists($file)) {
 				throw new ApplicationException(sprintf('No migration manifest file in %s', $file), 2204110944);
 			}
 			
@@ -53,5 +60,4 @@ class MigrationServiceProvider extends Provider
 			);
 		}
 	}
-	
 }
