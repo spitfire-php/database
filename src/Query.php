@@ -309,9 +309,12 @@ class Query
 	 */
 	public function getOutput(string $name) : SelectExpression
 	{
-		return $this->calculated->filter(function (SelectExpression $e) use ($name) {
+		$output = $this->calculated->filter(function (SelectExpression $e) use ($name) {
 			return $e->getName() === $name;
 		})->first();
+		
+		assert($output !== null);
+		return $output;
 	}
 	
 	/**
