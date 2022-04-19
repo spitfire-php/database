@@ -130,4 +130,9 @@ class RestrictionGroup extends Collection implements RestrictionInterface
 		return $this->type;
 	}
 	
+	public function table() : TableIdentifierInterface
+	{
+		return $this->table;
+	}
+	
 }
