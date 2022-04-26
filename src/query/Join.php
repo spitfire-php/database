@@ -87,7 +87,7 @@ abstract class Join
 	/**
 	 * Creates a group within the join's restrictions. The closure performs operations on the group,
 	 * allowing the application to change the group's type or add restrictions to it.
-	 * 
+	 *
 	 * @param callable(RestrictionGroup):void $inner
 	 * @return Join
 	 */

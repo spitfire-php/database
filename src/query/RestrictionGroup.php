@@ -145,7 +145,7 @@ class RestrictionGroup
 	}
 	
 	/**
-	 * 
+	 *
 	 * @return Collection<Restriction|RestrictionGroup>
 	 */
 	public function restrictions() : Collection
@@ -154,7 +154,7 @@ class RestrictionGroup
 	}
 	
 	/**
-	 * 
+	 *
 	 * @param string $name
 	 * @param mixed $arguments
 	 * @return mixed
@@ -167,5 +167,4 @@ class RestrictionGroup
 		
 		throw new BadMethodCallException(sprintf('Undefined method RestrictionGroup::%s', $name));
 	}
-	
 }

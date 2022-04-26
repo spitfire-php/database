@@ -15,13 +15,13 @@ class MigrateCommand extends Director
 	private $connection;
 	
 	/**
-	 * 
+	 *
 	 * @var MigrationOperationInterface[]
 	 */
 	private $migrations;
 	
 	/**
-	 * 
+	 *
 	 * @param Connection $connection
 	 * @param MigrationOperationInterface[] $migrations
 	 */
@@ -32,7 +32,7 @@ class MigrateCommand extends Director
 	}
 	
 	/**
-	 * 
+	 *
 	 * @return string[]
 	 */
 	public function parameters(): array
@@ -41,7 +41,7 @@ class MigrateCommand extends Director
 	}
 	
 	/**
-	 * 
+	 *
 	 * @param string[] $parameters
 	 * @param CLIParameters $arguments
 	 */
