@@ -114,7 +114,7 @@ class RestrictionGroup
 		$group->setType($type);
 		
 		#Add it to our restriction list
-		$this->push($group);
+		$this->restrictions->push($group);
 		return $group;
 	}
 	
