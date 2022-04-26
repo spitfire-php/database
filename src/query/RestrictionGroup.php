@@ -99,7 +99,7 @@ class RestrictionGroup
 		$value = $generator($this->table);
 		assert($value instanceof Query);
 		
-		$this->push(new Restriction(null, Restriction::EQUAL_OPERATOR, $value));
+		$this->restrictions->push(new Restriction(null, Restriction::EQUAL_OPERATOR, $value));
 		return $this;
 	}
 	
