@@ -80,7 +80,7 @@ abstract class Join
 		
 		assert($field instanceof IdentifierInterface);
 		
-		$this->on->push(new Restriction($field, $operator, $operand));
+		$this->on->restrictions()->push(new Restriction($field, $operator, $operand));
 		return $this;
 	}
 	

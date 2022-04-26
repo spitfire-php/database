@@ -356,7 +356,7 @@ class Query
 			'%s(%s) {%s}',
 			implode('.', $this->from->input()->raw()),
 			implode('.', $this->from->output()->raw()),
-			implode(',', $this->where->toArray())
+			implode(',', $this->where->restrictions()->toArray())
 		);
 	}
 }

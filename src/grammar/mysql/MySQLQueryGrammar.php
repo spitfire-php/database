@@ -144,11 +144,11 @@ class MySQLQueryGrammar
 		/**
 		 * A 1 is the way of MySQL to basically not filter anything.
 		 */
-		if ($restrictions->isEmpty()) {
+		if ($restrictions->restrictions()->isEmpty()) {
 			return '1';
 		}
 		
-		return $restrictions->each(function ($r) {
+		return $restrictions->restrictions()->each(function ($r) {
 			if ($r instanceof RestrictionGroup) {
 				return $this->whereConditions($r);
 			}

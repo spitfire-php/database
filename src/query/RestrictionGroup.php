@@ -81,7 +81,7 @@ class RestrictionGroup
 		}
 		
 		
-		$this->push(new Restriction($this->table->getOutput($field), $operator, $value));
+		$this->restrictions->push(new Restriction($this->table->getOutput($field), $operator, $value));
 		return $this;
 	}
 	
@@ -142,6 +142,15 @@ class RestrictionGroup
 	public function table() : TableIdentifierInterface
 	{
 		return $this->table;
+	}
+	
+	/**
+	 * 
+	 * @return Collection<Restriction|RestrictionGroup>
+	 */
+	public function restrictions() : Collection
+	{
+		return $this->restrictions;
 	}
 	
 	/**
