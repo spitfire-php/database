@@ -1,4 +1,4 @@
-<?php namespace spitfire\storage\database\drivers\mysqlpdo;
+<?php namespace spitfire\storage\database\migration\relational;
 
 use PDO;
 use spitfire\collection\Collection;

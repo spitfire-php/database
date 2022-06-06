@@ -53,15 +53,6 @@ interface DriverInterface
 	const MODE_DBG = 0x008;
 	
 	/**
-	 * Returns an object capable of making changes to the database, allowing migrations to
-	 * be applied and rolled back without issue.
-	 *
-	 * @param Schema $schema
-	 * @return SchemaMigrationExecutorInterface
-	 */
-	public function getMigrationExecutor(Schema $schema) : SchemaMigrationExecutorInterface;
-	
-	/**
 	 * Allows the driver to initialize the connection / file for the DBMS to be run,
 	 * it should be safe to call this function multiple times.
 	 */

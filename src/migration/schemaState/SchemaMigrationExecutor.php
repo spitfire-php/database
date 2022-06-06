@@ -1,4 +1,4 @@
-<?php namespace spitfire\storage\database\drivers\internal;
+<?php namespace spitfire\storage\database\migration\schemaState;
 
 use BadMethodCallException;
 use Closure;

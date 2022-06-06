@@ -1,6 +1,6 @@
 <?php namespace spitfire\storage\database\support\services;
 
-use spitfire\core\service\Provider;
+use spitfire\contracts\services\Provider;
 use spitfire\storage\database\Connection;
 use spitfire\storage\database\ConnectionManager;
 

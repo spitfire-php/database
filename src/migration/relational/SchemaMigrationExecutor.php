@@ -1,4 +1,4 @@
-<?php namespace spitfire\storage\database\drivers\mysqlpdo;
+<?php namespace spitfire\storage\database\migration\relational;
 
 use BadMethodCallException;
 use Closure;
@@ -6,7 +6,7 @@ use PDO;
 use PDOStatement;
 use spitfire\storage\database\drivers\SchemaMigrationExecutorInterface;
 use spitfire\storage\database\drivers\TableMigrationExecutorInterface;
-use spitfire\storage\database\drivers\internal\TableMigrationExecutor as GenericTableMigrationExecutor;
+use spitfire\storage\database\migration\schemaState\TableMigrationExecutor as GenericTableMigrationExecutor;
 use spitfire\storage\database\grammar\mysql\MySQLSchemaGrammar;
 use spitfire\storage\database\Layout;
 use spitfire\storage\database\migration\TagManagerInterface;
@@ -34,6 +34,8 @@ use spitfire\storage\database\Schema;
 /**
  * The schema migration executor allows migrations to modify the schema of the
  * database without requiring the user to actually write or maintain any SQL code.
+ * 
+ * @todo Needs a grammar to be injected so it can work
  */
 class SchemaMigrationExecutor implements SchemaMigrationExecutorInterface
 {
@@ -61,10 +63,6 @@ class SchemaMigrationExecutor implements SchemaMigrationExecutorInterface
 		/**
 		 * Create a layout and a generic migration executor so we can apply the migration
 		 * to the table in a nested way before committing it to the DBMS.
-		 *
-		 * @todo This depends on the generic migration system, since it is required to
-		 * perform all the table operations before the table is created. Passing a blank
-		 * table will provide a mechanism to create the table
 		 */
 		$table = new Layout($name);
 		$migrator = new GenericTableMigrationExecutor($table);

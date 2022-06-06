@@ -1,4 +1,4 @@
-<?php namespace spitfire\storage\database\drivers\internal;
+<?php namespace spitfire\storage\database\migration\schemaState;
 
 use spitfire\collection\Collection;
 use spitfire\storage\database\drivers\TableMigrationExecutorInterface;

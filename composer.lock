@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f72d4605fd1e64da2f2bb9a30bf2865b",
+    "content-hash": "3ddae14a697c644599aba9907621d4ee",
     "packages": [
         {
             "name": "magic3w/url-reflection",
@@ -49,6 +49,59 @@
                 "source": "https://github.com/Magic3W/url-reflection/tree/0.2.0"
             },
             "time": "2021-11-26T10:34:25+00:00"
+        },
+        {
+            "name": "psr/container",
+            "version": "2.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/container.git",
+                "reference": "c71ecc56dfe541dbd90c5360474fbc405f8d5963"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/container/zipball/c71ecc56dfe541dbd90c5360474fbc405f8d5963",
+                "reference": "c71ecc56dfe541dbd90c5360474fbc405f8d5963",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Container\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "https://www.php-fig.org/"
+                }
+            ],
+            "description": "Common Container Interface (PHP FIG PSR-11)",
+            "homepage": "https://github.com/php-fig/container",
+            "keywords": [
+                "PSR-11",
+                "container",
+                "container-interface",
+                "container-interop",
+                "psr"
+            ],
+            "support": {
+                "issues": "https://github.com/php-fig/container/issues",
+                "source": "https://github.com/php-fig/container/tree/2.0.2"
+            },
+            "time": "2021-11-05T16:47:00+00:00"
         },
         {
             "name": "psr/http-message",
@@ -194,6 +247,43 @@
                 "source": "https://github.com/spitfire-php/collection/tree/0.1.5"
             },
             "time": "2022-04-22T11:27:37+00:00"
+        },
+        {
+            "name": "spitfire/contracts",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spitfire-php/contracts.git",
+                "reference": "26db5a7014d524f10768a966230144c12221a933"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spitfire-php/contracts/zipball/26db5a7014d524f10768a966230144c12221a933",
+                "reference": "26db5a7014d524f10768a966230144c12221a933",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7||^8",
+                "psr/container": "^1.1.1|^2.0.1"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "spitfire\\contracts\\": "./"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Contract package for Spitfire. Use this to write code compatible with the framework",
+            "homepage": "https://spitfirephp.com",
+            "support": {
+                "issues": "https://github.com/spitfire-php/contracts/issues",
+                "source": "https://github.com/spitfire-php/contracts/tree/master"
+            },
+            "time": "2022-05-16T09:48:47+00:00"
         },
         {
             "name": "spitfire/event",
@@ -2635,10 +2725,12 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "spitfire/contracts": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }

@@ -32,7 +32,8 @@
 		"magic3w/url-reflection": "^0.2.0",
 		"psr/log": "^1.1",
 		"spitfire/event": "^0.1.0",
-		"spitfire/exception": "^0.1.1"
+		"spitfire/exception": "^0.1.1",
+		"spitfire/contracts": "dev-master"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "^9.5",

@@ -1,11 +1,11 @@
 <?php namespace spitfire\storage\database\support\commands;
 
 use spitfire\cli\arguments\CLIParameters;
-use spitfire\mvc\Director;
+use spitfire\contracts\cli\DirectorInterface;
 use spitfire\storage\database\Connection;
 use spitfire\storage\database\MigrationOperationInterface;
 
-class MigrateCommand extends Director
+class MigrateCommand implements DirectorInterface
 {
 	
 	/**

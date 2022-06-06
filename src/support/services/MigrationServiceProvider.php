@@ -1,7 +1,8 @@
 <?php namespace spitfire\storage\database\support\services;
 
 use spitfire\core\kernel\ConsoleKernel;
-use spitfire\core\service\Provider;
+use spitfire\contracts\services\Provider;
+use spitfire\contracts\ConfigurationInterface;
 use spitfire\exceptions\ApplicationException;
 use spitfire\storage\database\Connection;
 use spitfire\storage\database\support\commands\MigrateCommand;
@@ -36,7 +37,7 @@ class MigrationServiceProvider extends Provider
 			 * manifest file is relevant to the order in which they are applied
 			 * and rolled back.
 			 */
-			$file = config('app.database.migrations', 'bin/migrations.php');
+			$file = $this->container->get(ConfigurationInterface::class)->get('app.database.migrations', 'bin/migrations.php');
 			
 			/**
 			 * If there is no manifest, there is no way to consistently apply
