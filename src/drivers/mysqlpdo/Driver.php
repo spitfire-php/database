@@ -67,6 +67,16 @@ class Driver implements DriverInterface
 		$this->encoder  = new CharsetEncoder(mb_internal_encoding(), $settings->getEncoding());
 	}
 	
+	public function getDefaultQueryGrammar() : QueryGrammarInterface
+	{
+		return new MySQLQueryGrammar(new MySQLQuoter($this->connection));
+	}
+	
+	public function getDefaultRecordGrammar() : RecordGrammarInterface
+	{
+		return new MySQLRecordGrammar(new MySQLQuoter($this->connection));
+	}
+	
 	public function init() : void
 	{
 		/**
@@ -105,173 +115,16 @@ class Driver implements DriverInterface
 		}
 	}
 	
-	public function getMigrationExecutor(Schema $schema): SchemaMigrationExecutorInterface
+	
+	public function write(string $sql) : int|false
 	{
-		return new SchemaMigrationExecutor($this->connection, $schema);
+		
+		return $this->connection->exec($sql);
 	}
 	
-	public function query(Query $query): ResultSetInterface
-	{
-		$sql = (new MySQLQueryGrammar(new MySQLQuoter($this->connection)))->query($query);
-		$res = $this->_query($sql);
-		assert($res instanceof PDOStatement);
-		return new ResultSet($this->encoder, $res);
-	}
-	
-	public function update(LayoutInterface $layout, Record $record): bool
-	{
-		$grammar = new MySQLRecordGrammar(new MySQLQuoter($this->connection));
-		$stmt = $grammar->updateRecord($layout, $record);
-		
-		$this->logger->debug($stmt);
-		$result = $this->_exec($stmt);
-		$record->commit();
-		
-		return $result !== false;
-	}
-	
-	public function insert(LayoutInterface $layout, Record $record): bool
-	{
-		$grammar = new MySQLRecordGrammar(new MySQLQuoter($this->connection));
-		$stmt = $grammar->insertRecord($layout, $record);
-		
-		$this->logger->debug($stmt);
-		$result = $this->_exec($stmt);
-		
-		/**
-		 * In the event that the field is automatically incremented, the dbms
-		 * will provide us with the value it inserted. This value needs to be
-		 * stored to the record.
-		 */
-		$increment = $layout->getFields()->filter(function (Field $field) {
-			return $field->isAutoIncrement();
-		})->first();
-		
-		if ($increment !== null) {
-			$id = $this->connection->lastInsertId();
-			$record->set($increment->getName(), $id);
-		}
-		
-		/**
-		 * Since the database data is now in sync with the contents of the
-		 * record, we can commit the record as containing the same data that
-		 * the DBMS does.
-		 */
-		$record->commit();
-		
-		return $result !== false;
-	}
-	
-	public function delete(LayoutInterface $layout, Record $record): bool
-	{
-		$grammar = new MySQLRecordGrammar(new MySQLQuoter($this->connection));
-		$stmt = $grammar->deleteRecord($layout, $record);
-		
-		$this->logger->debug($stmt);
-		$result = $this->_exec($stmt);
-		
-		return $result !== false;
-	}
-	
-	
-	/**
-	 * Creates a database on MySQL's side where data can be stored on behalf of
-	 * the application.
-	 *
-	 * @return bool
-	 */
-	public function create(): bool
+	public function read(string $sql) : PDOStatement|false
 	{
 		
-		try {
-			$this->_exec(sprintf('CREATE DATABASE `%s`', $this->settings->getSchema()));
-			$this->_exec(sprintf('use `%s`;', $this->settings->getSchema()));
-			return true;
-		}
-		/*
-		 * Sometimes the database will issue a FileNotFound exception when attempting
-		 * to connect to a DBMS that fails if the database it expected to connect
-		 * to is not available.
-		 *
-		 * In this event we create a new connection that ignores the schema setting,
-		 * therefore allowing to connect to the database properly.
-		 */
-		catch (PDOException $e) {
-			return false;
-		}
-	}
-	
-	public function has(string $name): bool
-	{
-		$grammar = new MySQLSchemaGrammar();
-		$stmt = $this->_query($grammar->hasTable($this->settings->getSchema(), $name));
-		
-		assert($stmt instanceof PDOStatement);
-		return ($stmt->fetch()[0]) > 0;
-	}
-	
-	/**
-	 * Destroys the database housing the app's information.
-	 *
-	 * @return bool
-	 */
-	public function destroy(): bool
-	{
-		$this->_exec(sprintf('DROP DATABASE `%s`', $this->settings->getSchema()));
-		return true;
-	}
-	
-	public function mode(?int $mode = null): int
-	{
-		
-		if ($mode !== null) {
-			$this->mode = $mode;
-		}
-		
-		return $this->mode;
-	}
-	
-	private function _exec(string $sql) : int|false
-	{
-		
-		if ($this->mode & DriverInterface::MODE_PRT) {
-			echo $sql, PHP_EOL;
-		}
-		
-		if ($this->mode & DriverInterface::MODE_LOG) {
-			$this->logger->debug($sql);
-		}
-		
-		if ($this->mode & DriverInterface::MODE_DBG) {
-			xdebug_break();
-		}
-		
-		if ($this->mode & DriverInterface::MODE_EXC) {
-			return $this->connection->exec($sql);
-		}
-		
-		return false;
-	}
-	
-	private function _query(string $sql) : PDOStatement|false
-	{
-		
-		if ($this->mode & DriverInterface::MODE_PRT) {
-			echo $sql, PHP_EOL;
-		}
-		
-		if ($this->mode & DriverInterface::MODE_LOG) {
-			$this->logger->debug($sql);
-		}
-		
-		if ($this->mode & DriverInterface::MODE_DBG) {
-			xdebug_break();
-		}
-		
-		if ($this->mode & DriverInterface::MODE_EXC) {
-			return $this->connection->query($sql);
-		}
-		
-		return false;
+		return $this->connection->query($sql);
 	}
 }

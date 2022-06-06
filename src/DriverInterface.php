@@ -53,21 +53,6 @@ interface DriverInterface
 	const MODE_DBG = 0x008;
 	
 	/**
-	 * Allows the driver to initialize the connection / file for the DBMS to be run,
-	 * it should be safe to call this function multiple times.
-	 */
-	public function init() : void;
-	
-	/**
-	 * Query the database for data. The query needs to encapsulate all the data
-	 * that is needed for our DBMS to execute the query.
-	 *
-	 * @param Query $query
-	 * @return ResultSetInterface
-	 */
-	public function query(Query $query): ResultSetInterface;
-	
-	/**
 	 * Update database data in the DBMS. The result is true if the data was written
 	 * successfuly.
 	 *
