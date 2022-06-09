@@ -1,30 +1,40 @@
 <?php namespace spitfire\storage\database\support\services;
 
-use spitfire\contracts\services\Provider;
+use Psr\Container\ContainerInterface;
+use spitfire\contracts\ConfigurationInterface;
+use spitfire\contracts\services\ProviderInterface;
+use spitfire\provider\Container;
 use spitfire\storage\database\Connection;
 use spitfire\storage\database\ConnectionManager;
 
-class DatabaseServiceProvider extends Provider
+class DatabaseServiceProvider implements ProviderInterface
 {
 	
 	/**
-	 * 
+	 *
 	 * @return void
 	 */
-	public function register()
+	public function register(ContainerInterface $container)
 	{
-		$default = config('database.default');
-		$manager = new ConnectionManager(config('database.connections'));
+		$config  = $container->get(ConfigurationInterface::class);
+		$default = $config->get('database.default');
+		$manager = new ConnectionManager($config->get('database.connections'));
 		
-		$this->container->set(ConnectionManager::class, $manager);
-		$this->container->set(Connection::class, $manager->get($default));
+		/**
+		 *
+		 * @var Container
+		 */
+		$container = $container->get(Container::class);
+		
+		$container->set(ConnectionManager::class, $manager);
+		$container->set(Connection::class, $manager->get($default));
 	}
 	
 	/**
-	 * 
+	 *
 	 * @return void
 	 */
-	public function init()
+	public function init(ContainerInterface $container)
 	{
 	}
 }

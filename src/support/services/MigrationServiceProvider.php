@@ -1,63 +1,72 @@
 <?php namespace spitfire\storage\database\support\services;
 
-use spitfire\core\kernel\ConsoleKernel;
-use spitfire\contracts\services\Provider;
+use Psr\Container\ContainerInterface;
 use spitfire\contracts\ConfigurationInterface;
-use spitfire\exceptions\ApplicationException;
+use spitfire\contracts\core\kernel\ConsoleKernelInterface;
+use spitfire\contracts\core\kernel\KernelInterface;
+use spitfire\contracts\core\LocationsInterface;
+use spitfire\contracts\services\ProviderInterface;
 use spitfire\storage\database\Connection;
 use spitfire\storage\database\support\commands\MigrateCommand;
 
-class MigrationServiceProvider extends Provider
+class MigrationServiceProvider implements ProviderInterface
 {
-
+	
 	/**
-	 * 
+	 *
+	 * @var ConfigurationInterface
+	 */
+	private $config;
+	
+	/**
+	 *
+	 * @var LocationsInterface
+	 */
+	private $locations;
+	
+	public function __construct(ConfigurationInterface $config, LocationsInterface $locations)
+	{
+		$this->config = $config;
+		$this->locations = $locations;
+	}
+	
+	/**
+	 *
 	 * @return void
-	 */	
-	public function register()
+	 */
+	public function register(ContainerInterface $container)
 	{
 	}
 	
 	/**
-	 * 
+	 *
 	 * @return void
 	 */
-	public function init()
+	public function init(ContainerInterface $container)
 	{
-		if (cli()) {
-			$connection = $this->container->get(Connection::class);
+		/**
+		 * Please note that the order in which the migrations appear in the
+		 * manifest file is relevant to the order in which they are applied
+		 * and rolled back.
+		 * 
+		 * Also, note that for security reasons, the system will disable 
+		 * executing migrations from the web interface.
+		 */
+		if ($container->get(KernelInterface::class) instanceof ConsoleKernelInterface) {
 			
 			/**
-			 * The migration command will allow the system to import migrations
-			 * from the migrations manifest file which should contain an array
-			 * of migrations to be performed to maintain the application at a
-			 * modern state.
-			 *
-			 * Please note that the order in which the migrations appear in the
-			 * manifest file is relevant to the order in which they are applied
-			 * and rolled back.
+			 * Prepare the necessary components to prepare a command for running
+			 * migrations.
 			 */
-			$file = $this->container->get(ConfigurationInterface::class)->get('app.database.migrations', 'bin/migrations.php');
-			
-			/**
-			 * If there is no manifest, there is no way to consistently apply
-			 * the migrations.
-			 */
-			if (!file_exists($file)) {
-				throw new ApplicationException(sprintf('No migration manifest file in %s', $file), 2204110944);
-			}
-			
-			/**
-			 * List the migrations available to the application.
-			 */
-			$migrations = include(spitfire()->locations()->root($file));
+			$connection = $container->get(Connection::class);
+			$migrationFile = $this->config->get('app.database.migrations', 'bin/migrations.php');
+			$schemaFile = $this->config->get('app.database.migrations', 'app/migrations/_schema.php');
 			
 			/**
 			 * Register the available migration commands.
 			 */
-			$this->container->get(ConsoleKernel::class)->register(
-				'migrate',
-				new MigrateCommand($connection, $migrations)
+			$container->get(ConsoleKernelInterface::class)->register(
+				new MigrateCommand($connection, $this->locations->root($migrationFile), $this->locations->root($schemaFile))
 			);
 		}
 	}

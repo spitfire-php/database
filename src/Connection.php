@@ -1,8 +1,17 @@
 <?php namespace spitfire\storage\database;
 
 use PDOStatement;
+use spitfire\collection\Collection;
 use spitfire\exceptions\ApplicationException;
-use spitfire\storage\database\drivers\internal\SchemaMigrationExecutor;
+use spitfire\storage\database\drivers\Adapter;
+use spitfire\storage\database\drivers\SchemaMigrationExecutorInterface;
+use spitfire\storage\database\events\RecordBeforeInsertEvent;
+use spitfire\storage\database\grammar\mysql\QueryGrammarInterface;
+use spitfire\storage\database\grammar\mysql\RecordGrammarInterface;
+use spitfire\storage\database\grammar\SchemaGrammarInterface;
+use spitfire\storage\database\migration\group\SchemaMigrationExecutor as GroupSchemaMigrationExecutor;
+use spitfire\storage\database\migration\relational\SchemaMigrationExecutor as RelationalSchemaMigrationExecutor;
+use spitfire\storage\database\migration\schemaState\SchemaMigrationExecutor as SchemaStateSchemaMigrationExecutor;
 use spitfire\storage\database\query\ResultInterface;
 
 /**
@@ -14,53 +23,25 @@ class Connection
 	
 	/**
 	 *
-	 * @var DriverInterface
+	 * @var Adapter
 	 */
-	private $driver;
+	private $adapter;
 	
 	/**
 	 *
-	 * @todo Introduce the SchemaState class
-	 * @var SchemaState
+	 * @var Schema
 	 */
 	private $schema;
 	
-	/**
-	 * 
-	 * @todo Introduce the interface
-	 * @var QueryGrammarInterface
-	 */
-	private $queryGrammar;
-	
-	/**
-	 * 
-	 * @todo Introduce the interface
-	 * @var RecordGrammarInterface
-	 */
-	private $recordGrammar;
-	
-	/**
-	 * 
-	 * @todo Introduce the interface
-	 * @var SchemaGrammarInterface
-	 */
-	private $schemaGrammar;
+	private $migrator;
 	
 	/**
 	 *
 	 */
-	public function __construct(Schema $schema, DriverInterface $driver)
+	public function __construct(Schema $schema, Adapter $adapter)
 	{
-		$this->driver = $driver;
+		$this->adapter = $adapter;
 		$this->schema = $schema;
-		
-		/**
-		 * Default to the default grammars for the driver we loaded. These are generally
-		 * not overridden except for very specific situations and testing fixtures.
-		 */
-		$this->queryGrammar  = $driver->getDefaultQueryGrammar();
-		$this->recordGrammar = $driver->getDefaultRecordGrammar();
-		$this->schemaGrammar = $driver->getDefaultSchemaGrammar();
 	}
 	
 	/**
@@ -74,14 +55,27 @@ class Connection
 		return $this->schema;
 	}
 	
-	/**
-	 * Returns the driver used to manage this connection.
-	 *
-	 * @return DriverInterface
-	 */
-	public function getDriver() : DriverInterface
+	public function setSchema(Schema $schema) : Connection
 	{
-		return $this->driver;
+		$this->schema = $schema;
+		return $this;
+	}
+	
+	public function getAdapter() : Adapter
+	{
+		return $this->adapter;
+	}
+	
+	public function getMigrationExecutor() : SchemaMigrationExecutorInterface
+	{
+		if (!$this->migrator) {
+			$this->migrator = new GroupSchemaMigrationExecutor(new Collection([
+				new RelationalSchemaMigrationExecutor($this),
+				new SchemaStateSchemaMigrationExecutor($this->schema)
+			]));
+		}
+		
+		return $this->migrator;
 	}
 	
 	/**
@@ -93,19 +87,17 @@ class Connection
 	 */
 	public function contains(MigrationOperationInterface $migration): bool
 	{
-		$manager = $this->driver->getMigrationExecutor($this->schema)->tags();
-		
-		if ($manager === null) {
-			return false;
-		}
+		$manager = $this->getMigrationExecutor()->tags();
 		
 		$tags = $manager->listTags();
 		
-		return !!array_search(
+		$result = false !== array_search(
 			'migration:' . $migration->identifier(),
 			$tags,
 			true
 		);
+		
+		return $result;
 	}
 	
 	/**
@@ -117,15 +109,11 @@ class Connection
 	 */
 	public function apply(MigrationOperationInterface $migration): void
 	{
-		$migrators = [
-			$this->driver->getMigrationExecutor($this->schema),
-			new SchemaMigrationExecutor($this->schema)
-		];
 		
-		foreach ($migrators as $migrator) {
-			$migration->up($migrator);
-			$migrator->tags() !== null? $migrator->tags()->tag('migration:' . $migration->identifier()) : null;
-		}
+		$migrator = $this->getMigrationExecutor();
+		$migration->up($migrator);
+		$migrator->tags()->tag('migration:' . $migration->identifier());
+		
 	}
 	
 	/**
@@ -136,15 +124,9 @@ class Connection
 	 */
 	public function rollback(MigrationOperationInterface $migration): void
 	{
-		$migrators = [
-			$this->driver->getMigrationExecutor($this->schema),
-			new SchemaMigrationExecutor($this->schema)
-		];
-		
-		foreach ($migrators as $migrator) {
-			$migration->down($migrator);
-			$migrator->tags() !== null? $migrator->tags()->untag('migration:' . $migration->identifier()) : null;
-		}
+		$migrator = $this->getMigrationExecutor();
+		$migration->down($migrator);
+		$migrator->tags()->untag('migration:' . $migration->identifier());
 	}
 	
 	/**
@@ -156,14 +138,14 @@ class Connection
 	 */
 	public function query(Query $query): ResultInterface
 	{
-		$sql = $this->queryGrammar->query($query);
-		return $this->driver->read($sql);
+		$sql = $this->adapter->getQueryGrammar()->query($query);
+		return $this->adapter->getDriver()->read($sql);
 	}
 	
 	public function update(LayoutInterface $layout, Record $record): bool
 	{
-		$stmt   = $this->recordGrammar->updateRecord($layout, $record);
-		$result = $this->driver->write($stmt);
+		$stmt   = $this->adapter->getRecordGrammar()->updateRecord($layout, $record);
+		$result = $this->adapter->getDriver()->write($stmt);
 		
 		/**
 		 * Commit that the record has been written to the database. The record will be in sync
@@ -177,8 +159,19 @@ class Connection
 	
 	public function insert(LayoutInterface $layout, Record $record): bool
 	{
-		$stmt = $this->recordGrammar->insertRecord($layout, $record);		
-		$result = $this->driver->write($stmt);
+		$event  = new RecordBeforeInsertEvent($this, $layout, $record);
+		
+		$layout->events()->dispatch(
+			$event,
+			function () {}
+		);
+		
+		if ($event->isPrevented()) {
+			return true;
+		}
+		
+		$stmt = $this->adapter->getRecordGrammar()->insertRecord($layout, $record);
+		$result = $this->adapter->getDriver()->write($stmt);
 		
 		/**
 		 * In the event that the field is automatically incremented, the dbms
@@ -190,7 +183,7 @@ class Connection
 		})->first();
 		
 		if ($increment !== null) {
-			$id = $this->connection->lastInsertId();
+			$id = $this->adapter->getDriver()->lastInsertId();
 			$record->set($increment->getName(), $id);
 		}
 		
@@ -207,17 +200,23 @@ class Connection
 	
 	public function delete(LayoutInterface $layout, Record $record): bool
 	{
-		$stmt = $this->recordGrammar->deleteRecord($layout, $record);
-		$result = $this->driver->write($stmt);
+		$stmt = $this->adapter->getRecordGrammar()->deleteRecord($layout, $record);
+		$result = $this->adapter->getDriver()->write($stmt);
 		
 		return $result !== false;
 	}
 	
 	public function has(string $name): bool
 	{
-		$stmt = $this->driver->read($this->schemaGrammar->hasTable($this->settings->getSchema(), $name));
+		$sql  = $this->adapter->getSchemaGrammar()->hasTable($this->schema->getName()?: '', $name);
+		$stmt = $this->adapter->getDriver()->read($sql);
 		
 		assert($stmt instanceof PDOStatement);
-		return ($stmt->fetch()[0]) > 0;
+		return ($stmt->fetchColumn()) > 0;
+	}
+	
+	public function __clone()
+	{
+		$this->migrator = null;
 	}
 }

@@ -45,6 +45,10 @@ class SchemaMigrationExecutor implements SchemaMigrationExecutorInterface
 	 */
 	private $migrators;
 	
+	/**
+	 * 
+	 * @param Collection<SchemaMigrationExecutorInterface> $migrators
+	 */
 	public function __construct(Collection $migrators)
 	{
 		assert($migrators->containsOnly(SchemaMigrationExecutorInterface::class));
@@ -61,7 +65,7 @@ class SchemaMigrationExecutor implements SchemaMigrationExecutorInterface
 	 */
 	public function add(string $name, Closure $fn): SchemaMigrationExecutorInterface
 	{
-		foreach($this->migrators as $migrator) {
+		foreach ($this->migrators as $migrator) {
 			$migrator->add($name, $fn);
 		}
 		
@@ -77,7 +81,7 @@ class SchemaMigrationExecutor implements SchemaMigrationExecutorInterface
 	 */
 	public function rename(string $from, string $to): SchemaMigrationExecutorInterface
 	{
-		foreach($this->migrators as $migrator) {
+		foreach ($this->migrators as $migrator) {
 			$migrator->rename($from, $to);
 		}
 		
@@ -92,9 +96,10 @@ class SchemaMigrationExecutor implements SchemaMigrationExecutorInterface
 	 */
 	public function drop(string $name): SchemaMigrationExecutorInterface
 	{
-		foreach($this->migrators as $migrator) {
+		foreach ($this->migrators as $migrator) {
 			$migrator->drop($name);
 		}
+		return $this;
 	}
 	
 	/**
@@ -107,9 +112,11 @@ class SchemaMigrationExecutor implements SchemaMigrationExecutorInterface
 	 */
 	public function table(string $name): TableMigrationExecutorInterface
 	{
-		$result = $this->migrators->each(function (SchemaMigrationExecutorInterface $e) use ($name) : bool {
-			return $e->table($name);
-		});
+		$result = $this->migrators->each(
+			function (SchemaMigrationExecutorInterface $e) use ($name) : TableMigrationExecutorInterface {
+				return $e->table($name);
+			}
+		);
 		
 		return new TableMigrationExecutor($result);
 	}
@@ -125,7 +132,7 @@ class SchemaMigrationExecutor implements SchemaMigrationExecutorInterface
 		 */
 		assert($result->unique()->count() === 1);
 		
-		return $result->first();
+		return !!$result->first();
 	}
 	
 	/**
@@ -137,7 +144,7 @@ class SchemaMigrationExecutor implements SchemaMigrationExecutorInterface
 	 */
 	public function execute(string $sql): SchemaMigrationExecutorInterface
 	{
-		foreach($this->migrators as $migrator) {
+		foreach ($this->migrators as $migrator) {
 			$migrator->execute($sql);
 		}
 		
@@ -148,8 +155,8 @@ class SchemaMigrationExecutor implements SchemaMigrationExecutorInterface
 	 * @todo Write a group tag manager interface that can manage having several surrogate
 	 * tagmanagers
 	 */
-	public function tags():? TagManagerInterface
+	public function tags(): TagManagerInterface
 	{
-		return null;
+		return $this->migrators->first()->tags();
 	}
 }

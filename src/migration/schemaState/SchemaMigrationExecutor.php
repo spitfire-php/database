@@ -5,7 +5,6 @@ use Closure;
 use spitfire\storage\database\drivers\SchemaMigrationExecutorInterface;
 use spitfire\storage\database\drivers\TableMigrationExecutorInterface;
 use spitfire\storage\database\Layout;
-use spitfire\storage\database\migration\TagManager;
 use spitfire\storage\database\migration\TagManagerInterface;
 use spitfire\storage\database\Schema;
 
@@ -122,8 +121,26 @@ class SchemaMigrationExecutor implements SchemaMigrationExecutorInterface
 		return $this;
 	}
 	
-	public function tags():? TagManagerInterface
+	/**
+	 * @todo Implement
+	 */
+	public function tags(): TagManagerInterface
 	{
-		return null;
+		return new class implements TagManagerInterface {
+			public function listTags(): array
+			{
+				return [];
+			}
+			
+			public function tag(string $tag): void
+			{
+				return;
+			}
+			
+			public function untag(string $tag): void
+			{
+				return;
+			}
+		};
 	}
 }

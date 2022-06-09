@@ -6,18 +6,15 @@ use PDOStatement;
 use Psr\Log\LoggerInterface;
 use spitfire\exceptions\ApplicationException;
 use spitfire\storage\database\DriverInterface;
-use spitfire\storage\database\drivers\SchemaMigrationExecutorInterface;
-use spitfire\storage\database\Field;
 use spitfire\storage\database\grammar\mysql\MySQLQueryGrammar;
 use spitfire\storage\database\grammar\mysql\MySQLQuoter;
 use spitfire\storage\database\grammar\mysql\MySQLRecordGrammar;
 use spitfire\storage\database\grammar\mysql\MySQLSchemaGrammar;
+use spitfire\storage\database\grammar\QueryGrammarInterface;
+use spitfire\storage\database\grammar\RecordGrammarInterface;
+use spitfire\storage\database\grammar\SchemaGrammarInterface;
 use spitfire\storage\database\io\CharsetEncoder;
-use spitfire\storage\database\LayoutInterface;
-use spitfire\storage\database\Query;
-use spitfire\storage\database\Record;
-use spitfire\storage\database\ResultSetInterface;
-use spitfire\storage\database\Schema;
+use spitfire\storage\database\query\ResultInterface;
 use spitfire\storage\database\Settings;
 
 /**
@@ -53,12 +50,6 @@ class Driver implements DriverInterface
 	 */
 	private $logger;
 	
-	/**
-	 *
-	 * @var int
-	 */
-	private $mode = DriverInterface::MODE_EXC;
-	
 	
 	public function __construct(Settings $settings, LoggerInterface $logger)
 	{
@@ -77,15 +68,13 @@ class Driver implements DriverInterface
 		return new MySQLRecordGrammar(new MySQLQuoter($this->connection));
 	}
 	
-	public function init() : void
+	public function getDefaultSchemaGrammar(): SchemaGrammarInterface
 	{
-		/**
-		 * If the driver isn't hot, we assume the connection is not expected.
-		 */
-		if (!($this->mode & DriverInterface::MODE_EXC)) {
-			return;
-		}
-		
+		return new MySQLSchemaGrammar();
+	}
+	
+	public function connect() : void
+	{
 		$encoding = ['utf8' => 'utf8mb4'][$this->encoder->getInnerEncoding()];
 		
 		/**
@@ -115,16 +104,39 @@ class Driver implements DriverInterface
 		}
 	}
 	
-	
-	public function write(string $sql) : int|false
+	/**
+	 * 
+	 * @throws ApplicationException
+	 */
+	public function write(string $sql) : int
 	{
+		$this->logger->debug($sql);
+		assert($this->connection !== null);
+		$result = $this->connection->exec($sql);
 		
-		return $this->connection->exec($sql);
+		if ($result === false) {
+			throw new ApplicationException(sprintf('Query "%s" failed', $sql));
+		}
+		
+		return $result;
 	}
 	
-	public function read(string $sql) : PDOStatement|false
+	public function read(string $sql) : ResultInterface
 	{
+		$this->logger->debug($sql);
 		
-		return $this->connection->query($sql);
+		/**
+		 * Make sure that the connection has been established.
+		 */
+		assert($this->connection !== null);
+		$stmt = $this->connection->query($sql);
+		assert($stmt !== false);
+		return new MySQLResult($stmt);
+	}
+	
+	public function lastInsertId(): string|false
+	{
+		assert($this->connection !== null);
+		return $this->connection->lastInsertId();
 	}
 }
