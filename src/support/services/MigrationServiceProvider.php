@@ -59,8 +59,8 @@ class MigrationServiceProvider implements ProviderInterface
 			 * migrations.
 			 */
 			$connection = $container->get(Connection::class);
-			$migrationFile = $this->config->get('app.database.migrations', 'bin/migrations.php');
-			$schemaFile = $this->config->get('app.database.migrations', 'app/migrations/_schema.php');
+			$migrationFile = $this->config->get('app.database.migrations.file', 'bin/migrations.php');
+			$schemaFile = $this->config->get('app.database.migrations.baseline', 'app/migrations/_schema.php');
 			
 			/**
 			 * Register the available migration commands.
