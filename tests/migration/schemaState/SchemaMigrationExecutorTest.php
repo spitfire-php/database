@@ -4,7 +4,7 @@ use spitfire\storage\database\Schema;
 use PHPUnit\Framework\TestCase;
 use spitfire\storage\database\migration\schemaState\SchemaMigrationExecutor;
 
-/* 
+/*
  * Copyright (C) 2021 César de la Cal Bretschneider <cesar@magic3w.com>.
  *
  * This library is free software; you can redistribute it and/or

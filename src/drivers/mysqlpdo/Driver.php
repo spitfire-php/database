@@ -105,7 +105,7 @@ class Driver implements DriverInterface
 	}
 	
 	/**
-	 * 
+	 *
 	 * @throws ApplicationException
 	 */
 	public function write(string $sql) : int

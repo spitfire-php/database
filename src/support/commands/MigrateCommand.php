@@ -70,8 +70,8 @@ class MigrateCommand extends Command
 		
 		$connection = clone $this->connection;
 		$connection->setSchema(
-			file_exists($this->schemaFile)? 
-				include $this->schemaFile : 
+			file_exists($this->schemaFile)?
+				include $this->schemaFile :
 				new Schema($this->connection->getSchema()->getName())
 		);
 		

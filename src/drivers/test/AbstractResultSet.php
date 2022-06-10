@@ -8,13 +8,13 @@ class AbstractResultSet implements ResultInterface
 {
 	
 	/**
-	 * 
+	 *
 	 * @var string[][]
 	 */
 	private $result;
 	
 	/**
-	 * 
+	 *
 	 * @param string[][] $result
 	 */
 	public function __construct(array $result)

@@ -79,7 +79,7 @@ class TableMigrationExecutor implements TableMigrationExecutorInterface
 	 */
 	public function int(string $name, bool $unsigned): TableMigrationExecutorInterface
 	{
-		$this->table->putField($name, $unsigned? 'int:unsigned' : 'int', false, true);
+		$this->table->putField($name, $unsigned? 'int:unsigned' : 'int', true, false);
 		return $this;
 	}
 	

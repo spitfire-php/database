@@ -33,6 +33,10 @@ class Connection
 	 */
 	private $schema;
 	
+	/**
+	 *
+	 * @var SchemaMigrationExecutorInterface|null
+	 */
 	private $migrator;
 	
 	/**
@@ -68,7 +72,7 @@ class Connection
 	
 	public function getMigrationExecutor() : SchemaMigrationExecutorInterface
 	{
-		if (!$this->migrator) {
+		if ($this->migrator === null) {
 			$this->migrator = new GroupSchemaMigrationExecutor(new Collection([
 				new RelationalSchemaMigrationExecutor($this),
 				new SchemaStateSchemaMigrationExecutor($this->schema)
@@ -113,7 +117,6 @@ class Connection
 		$migrator = $this->getMigrationExecutor();
 		$migration->up($migrator);
 		$migrator->tags()->tag('migration:' . $migration->identifier());
-		
 	}
 	
 	/**
@@ -163,7 +166,8 @@ class Connection
 		
 		$layout->events()->dispatch(
 			$event,
-			function () {}
+			function () {
+			}
 		);
 		
 		if ($event->isPrevented()) {

@@ -48,8 +48,8 @@ class MigrationServiceProvider implements ProviderInterface
 		 * Please note that the order in which the migrations appear in the
 		 * manifest file is relevant to the order in which they are applied
 		 * and rolled back.
-		 * 
-		 * Also, note that for security reasons, the system will disable 
+		 *
+		 * Also, note that for security reasons, the system will disable
 		 * executing migrations from the web interface.
 		 */
 		if ($container->get(KernelInterface::class) instanceof ConsoleKernelInterface) {

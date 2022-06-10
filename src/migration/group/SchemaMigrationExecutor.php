@@ -3,6 +3,7 @@
 use BadMethodCallException;
 use Closure;
 use spitfire\collection\Collection;
+use spitfire\exceptions\ApplicationException;
 use spitfire\storage\database\drivers\SchemaMigrationExecutorInterface;
 use spitfire\storage\database\drivers\TableMigrationExecutorInterface;
 use spitfire\storage\database\Layout;
@@ -46,7 +47,7 @@ class SchemaMigrationExecutor implements SchemaMigrationExecutorInterface
 	private $migrators;
 	
 	/**
-	 * 
+	 *
 	 * @param Collection<SchemaMigrationExecutorInterface> $migrators
 	 */
 	public function __construct(Collection $migrators)
@@ -157,6 +158,9 @@ class SchemaMigrationExecutor implements SchemaMigrationExecutorInterface
 	 */
 	public function tags(): TagManagerInterface
 	{
-		return $this->migrators->first()->tags();
+		$first = $this->migrators->first();
+		assert($first !== null);
+		
+		return $first->tags();
 	}
 }

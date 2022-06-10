@@ -40,7 +40,7 @@ class Schema
 	 * The name of the schema. Most DBMS allow having multiple schemas in a single server
 	 * or have a filename to identify the schema.
 	 *
-	 * @var string|null
+	 * @var string
 	 */
 	private $name;
 	
@@ -64,11 +64,11 @@ class Schema
 	
 	/**
 	 * Returns the name of the schema. Some DBMS do not support multiple schemas on a single
-	 * database server / file. These may return null.
+	 * database server / file. These may return an empty string.
 	 *
-	 * @return string|null
+	 * @return string
 	 */
-	public function getName() :? string
+	public function getName() : string
 	{
 		return $this->name;
 	}
@@ -89,7 +89,7 @@ class Schema
 	
 	/**
 	 * Checks whether the schema contains a layout with a certain name. This is generally used for testing
-	 * 
+	 *
 	 * @param string $name
 	 * @return bool
 	 */
@@ -135,7 +135,7 @@ class Schema
 	
 	/**
 	 * Removes a Layout from the Schema.
-	 * 
+	 *
 	 * @param Layout $layout
 	 * @return Schema
 	 */

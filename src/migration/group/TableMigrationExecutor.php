@@ -46,7 +46,7 @@ class TableMigrationExecutor implements TableMigrationExecutorInterface
 	private $migrators;
 	
 	/**
-	 * 
+	 *
 	 * @param Collection<TableMigrationExecutorInterface> $migrators
 	 */
 	public function __construct(Collection $migrators)

@@ -1,18 +1,14 @@
 <?php namespace spitfire\storage\database\migration\relational;
 
-use BadMethodCallException;
 use Closure;
-use LDAP\Result;
-use PDO;
-use PDOStatement;
 use spitfire\storage\database\Connection;
-use spitfire\storage\database\DriverInterface;
 use spitfire\storage\database\drivers\Adapter;
 use spitfire\storage\database\drivers\SchemaMigrationExecutorInterface;
 use spitfire\storage\database\drivers\TableMigrationExecutorInterface;
 use spitfire\storage\database\migration\schemaState\TableMigrationExecutor as GenericTableMigrationExecutor;
 use spitfire\storage\database\Layout;
 use spitfire\storage\database\migration\TagManagerInterface;
+use spitfire\storage\database\query\ResultInterface;
 use spitfire\storage\database\Schema;
 
 /*
@@ -37,12 +33,16 @@ use spitfire\storage\database\Schema;
 /**
  * The schema migration executor allows migrations to modify the schema of the
  * database without requiring the user to actually write or maintain any SQL code.
- * 
+ *
  * @todo Needs a grammar to be injected so it can work
  */
 class SchemaMigrationExecutor implements SchemaMigrationExecutorInterface
 {
 	
+	/**
+	 *
+	 * @var TagManagerInterface|null
+	 */
 	private $tags;
 	
 	/**
@@ -167,7 +167,7 @@ class SchemaMigrationExecutor implements SchemaMigrationExecutorInterface
 		$grammar = $this->adapter->getSchemaGrammar();
 		$stmt = $this->adapter->getDriver()->read($grammar->hasTable($this->schema->getName(), $name));
 		
-		assert($stmt instanceof Result);
+		assert($stmt instanceof ResultInterface);
 		return ($stmt->fetchOne()) > 0;
 	}
 	

@@ -14,29 +14,29 @@ class Adapter
 {
 	
 	/**
-	 * 
+	 *
 	 * @var DriverInterface
 	 */
 	private $driver;
 	
 	/**
-	 * 
+	 *
 	 * @var QueryGrammarInterface|null
 	 */
 	private $queryGrammar;
 	
 	/**
-	 * 
+	 *
 	 * @var RecordGrammarInterface|null
 	 */
 	private $recordGrammar;
 	
 	/**
-	 * 
+	 *
 	 * @var SchemaGrammarInterface|null
 	 */
 	private $schemaGrammar;
-
+	
 	public function __construct(
 		DriverInterface $driver,
 		QueryGrammarInterface $queryGrammar = null,
@@ -48,7 +48,7 @@ class Adapter
 		$this->recordGrammar = $recordGrammar ?: $driver->getDefaultRecordGrammar();
 		$this->schemaGrammar = $schemaGrammar ?: $driver->getDefaultSchemaGrammar();
 	}
-
+	
 	/**
 	 * Get the value of driver
 	 */
