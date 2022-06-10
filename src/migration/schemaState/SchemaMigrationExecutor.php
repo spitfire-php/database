@@ -122,7 +122,6 @@ class SchemaMigrationExecutor implements SchemaMigrationExecutorInterface
 	}
 	
 	/**
-	 * @todo Implement
 	 */
 	public function tags(): TagManagerInterface
 	{

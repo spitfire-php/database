@@ -1,6 +1,8 @@
 <?php namespace spitfire\storage\database;
 
+use Psr\Container\ContainerInterface;
 use spitfire\collection\Collection;
+use spitfire\provider\Container;
 use spitfire\storage\database\drivers\Adapter;
 use spitfire\storage\database\drivers\mysqlpdo\Driver;
 
@@ -15,6 +17,12 @@ class ConnectionManager
 	
 	/**
 	 *
+	 * @var ContainerInterface
+	 */
+	private $container;
+	
+	/**
+	 *
 	 * @var mixed[]
 	 */
 	private $definitions;
@@ -23,8 +31,9 @@ class ConnectionManager
 	 *
 	 * @param mixed[] $definitions
 	 */
-	public function __construct(array $definitions)
+	public function __construct(ContainerInterface $container, array $definitions)
 	{
+		$this->container = $container;
 		$this->definitions = $definitions;
 		$this->connections = new Collection();
 	}
@@ -75,10 +84,7 @@ class ConnectionManager
 		 */
 		$type   = $definition['driver'];
 		
-		/**
-		 * @todo Replace with dependency injection
-		 */
-		$driver = spitfire()->provider()->assemble($type, [
+		$driver = $this->container->get(Container::class)->assemble($type, [
 			'settings' => $settings
 		]);
 		

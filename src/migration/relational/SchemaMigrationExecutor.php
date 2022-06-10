@@ -34,7 +34,6 @@ use spitfire\storage\database\Schema;
  * The schema migration executor allows migrations to modify the schema of the
  * database without requiring the user to actually write or maintain any SQL code.
  *
- * @todo Needs a grammar to be injected so it can work
  */
 class SchemaMigrationExecutor implements SchemaMigrationExecutorInterface
 {

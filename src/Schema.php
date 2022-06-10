@@ -30,8 +30,6 @@ use spitfire\collection\OutOfBoundsException;
  * This also allows the drivers to suggest migrations using a diff method in
  * future versions of the application.
  *
- * @todo Add a diff version to the driver so two schemas can be tested as different
- * @todo Add a migrations method to the schema itself that returns a bunch of migrations
  */
 class Schema
 {

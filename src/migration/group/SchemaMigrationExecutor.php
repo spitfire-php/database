@@ -106,8 +106,6 @@ class SchemaMigrationExecutor implements SchemaMigrationExecutorInterface
 	/**
 	 * Allows the application to descend into migrations pertaining to the table.
 	 *
-	 * @todo Write a group table migrator interface that can manage having several surrogate
-	 * table migrators
 	 * @param string $name
 	 * @return TableMigrationExecutorInterface
 	 */
@@ -152,10 +150,6 @@ class SchemaMigrationExecutor implements SchemaMigrationExecutorInterface
 		return $this;
 	}
 	
-	/**
-	 * @todo Write a group tag manager interface that can manage having several surrogate
-	 * tagmanagers
-	 */
 	public function tags(): TagManagerInterface
 	{
 		$first = $this->migrators->first();
