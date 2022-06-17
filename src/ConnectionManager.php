@@ -22,6 +22,12 @@ class ConnectionManager
 	private $container;
 	
 	/**
+	 * 
+	 * @var string
+	 */
+	private $schemaFile;
+	
+	/**
 	 *
 	 * @var mixed[]
 	 */
@@ -31,10 +37,11 @@ class ConnectionManager
 	 *
 	 * @param mixed[] $definitions
 	 */
-	public function __construct(ContainerInterface $container, array $definitions)
+	public function __construct(ContainerInterface $container, array $definitions, string $schemaFile)
 	{
 		$this->container = $container;
 		$this->definitions = $definitions;
+		$this->schemaFile = $schemaFile;
 		$this->connections = new Collection();
 	}
 	
@@ -73,7 +80,7 @@ class ConnectionManager
 		 * allowing the application to verify that no data is being accessed that should not be
 		 * read.
 		 */
-		$schemaFile = $definition['schema'];
+		$schemaFile = $definition['schema']?? $this->schemaFile;
 		$schema = file_exists($schemaFile)? include($schemaFile) : new Schema($settings->getSchema());
 		
 		/**

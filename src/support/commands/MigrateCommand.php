@@ -7,6 +7,7 @@ use spitfire\storage\database\MigrationOperationInterface;
 use spitfire\storage\database\Schema;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class MigrateCommand extends Command
@@ -31,19 +32,38 @@ class MigrateCommand extends Command
 	 *
 	 * @var string
 	 */
-	private $schemaFile;
+	private $schemaBaseline;
+	
+	/**
+	 *
+	 * @var string
+	 */
+	private $schemaCacheFile;
 	
 	/**
 	 *
 	 * @param Connection $connection
 	 * @param string $migrationManifestFile
+	 * @param string $schemaBaseline
+	 * @param string $schemaCacheFile
 	 */
-	public function __construct(Connection $connection, string $migrationManifestFile, string $schemaFile)
+	public function __construct(Connection $connection, string $migrationManifestFile, string $schemaBaseline, string $schemaCacheFile)
 	{
 		$this->connection = $connection;
 		$this->migrationManifestFile = $migrationManifestFile;
-		$this->schemaFile = $schemaFile;
+		$this->schemaBaseline = $schemaBaseline;
+		$this->schemaCacheFile = $schemaCacheFile;
 		parent::__construct();
+	}
+	
+	protected function configure()
+	{
+		$this->addOption(
+			'dump',
+			null,
+			InputOption::VALUE_NONE | InputOption::VALUE_NEGATABLE,
+			'Dump the schema file to cache'
+		);
 	}
 	
 	protected function execute(InputInterface $input, OutputInterface $output)
@@ -61,6 +81,17 @@ class MigrateCommand extends Command
 		$file = $this->migrationManifestFile;
 		
 		/**
+		 * Get the baseline schema. This represents the state the application expects
+		 * the schema to be in before attempting any migrations.
+		 */
+		if (file_exists($this->schemaBaseline)) {
+			$schema = include $this->schemaBaseline;
+		}
+		else {
+			$schema = new Schema($this->connection->getSchema()->getName());
+		}
+		
+		/**
 		 * If there is no manifest, there is no way to consistently apply
 		 * the migrations.
 		 */
@@ -69,11 +100,7 @@ class MigrateCommand extends Command
 		}
 		
 		$connection = clone $this->connection;
-		$connection->setSchema(
-			file_exists($this->schemaFile)?
-				include $this->schemaFile :
-				new Schema($this->connection->getSchema()->getName())
-		);
+		$connection->setSchema($schema);
 		
 		/**
 		 * List the migrations available to the application.
@@ -86,7 +113,7 @@ class MigrateCommand extends Command
 		 */
 		foreach ($migrations as $migration) {
 			$output->writeln('Checking ' . $migration->identifier());
-			if ($result = $connection->contains($migration)) {
+			if ($connection->contains($migration)) {
 				$migration->up(new SchemaMigrationExecutor($connection->getSchema()));
 			}
 			else {
@@ -95,9 +122,8 @@ class MigrateCommand extends Command
 		}
 		
 		/**
-		 * Fast forward the schema to match the status of the server
+		 * Apply migrations to the server to ensure that the schema is up-to-date.
 		 */
-		
 		foreach	($migrations as $migration) {
 			if (!$connection->contains($migration)) {
 				assert($migration instanceof MigrationOperationInterface);
@@ -107,6 +133,25 @@ class MigrateCommand extends Command
 			else {
 				$output->writeln('Skipping...');
 			}
+		}
+		
+		/**
+		 * Write the schema to disk. If the server
+		 */
+		if ($input->getOption('dump') !== false) {
+			$output->writeln('Writing schema to disk...');
+			
+			/**
+			 * Write the schema file to the cache. Please note that while this is technically a
+			 * cache file, it should generally be committed when using an application that has
+			 * several backend servers accessing a single database.
+			 *
+			 * This is why this file is stored in /bin/schema.php by default.
+			 */
+			file_put_contents(
+				$this->schemaCacheFile,
+				sprintf('<?php return %s;', var_export($schema, true))
+			);
 		}
 		
 		return 0;

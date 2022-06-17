@@ -18,7 +18,8 @@ class DatabaseServiceProvider implements ProviderInterface
 	{
 		$config  = $container->get(ConfigurationInterface::class);
 		$default = $config->get('database.default');
-		$manager = new ConnectionManager($container, $config->get('database.connections'));
+		$schema  = $config->get('app.database.schema', 'bin/schema.php');
+		$manager = new ConnectionManager($container, $config->get('database.connections'), $schema);
 		
 		/**
 		 *
