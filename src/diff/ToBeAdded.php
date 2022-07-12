@@ -6,20 +6,20 @@ use spitfire\storage\database\IndexInterface;
 
 /**
  * ToBeAdded is just a very syntactical way of describing a partial layout,
- * they contain similar information to a layout, but they do not have to 
+ * they contain similar information to a layout, but they do not have to
  * add up to a complete layout.
  */
 class ToBeAdded
 {
 	
 	/**
-	 * 
+	 *
 	 * @var Collection<Field>
 	 */
 	private Collection $fields;
 	
 	/**
-	 * 
+	 *
 	 * @var Collection<IndexInterface>
 	 */
 	private Collection $indexes;
@@ -43,7 +43,7 @@ class ToBeAdded
 	}
 	
 	/**
-	 * 
+	 *
 	 * @return Collection<Field>
 	 */
 	public function getFields() : Collection
@@ -52,7 +52,7 @@ class ToBeAdded
 	}
 	
 	/**
-	 * 
+	 *
 	 * @return Collection<IndexInterface>
 	 */
 	public function getIndexes() : Collection

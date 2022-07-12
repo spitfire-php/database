@@ -50,7 +50,7 @@ class Generator
 				$_result->addIndex($index);
 			}
 			/**
-			 * In case the indexes are not identical, we need to make sure that we add them to the 
+			 * In case the indexes are not identical, we need to make sure that we add them to the
 			 * list of changes.
 			 */
 			elseif (IndexUtils::equals($index, $base->getIndex($index->getName()))) {
