@@ -45,6 +45,11 @@
 		"symfony/console": "^6.0",
 		"spitfire/engine": "dev-master"
 	},
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.x-dev"
+        }
+    },
 
 	"repositories":
 	[

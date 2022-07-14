@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d363146793c42efabaaf0fb0f820daec",
+    "content-hash": "cabaec77de384c8be586cb8276abed96",
     "packages": [
         {
             "name": "andrewbreksa/rsmq",
@@ -1048,16 +1048,16 @@
         },
         {
             "name": "spitfire/engine",
-            "version": "dev-dev/attributes",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Csardelacal/SpitfireEngine.git",
-                "reference": "d2977fa044f58176b0a14ee12af2aecf68bbc9d4"
+                "reference": "1d2890164ddae0e2630b5bc179a4d05e41bb0eb6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Csardelacal/SpitfireEngine/zipball/d2977fa044f58176b0a14ee12af2aecf68bbc9d4",
-                "reference": "d2977fa044f58176b0a14ee12af2aecf68bbc9d4",
+                "url": "https://api.github.com/repos/Csardelacal/SpitfireEngine/zipball/1d2890164ddae0e2630b5bc179a4d05e41bb0eb6",
+                "reference": "1d2890164ddae0e2630b5bc179a4d05e41bb0eb6",
                 "shasum": ""
             },
             "require": {
@@ -1086,7 +1086,7 @@
                 "league/flysystem-aws-s3-v3": "^3.0",
                 "magic3w/php-coding-standard": "^1.0",
                 "monolog/monolog": "^3.1",
-                "phpstan/phpstan": "^1.8",
+                "phpstan/phpstan": "^1.7",
                 "phpunit/phpunit": "^9.5",
                 "pug-php/pug": "^3.4",
                 "scrutinizer/ocular": "^1.9"
@@ -1096,6 +1096,7 @@
                 "league/flysystem-aws-s3-v3": "Storage driver for S3 compatible servers",
                 "monolog/monolog": "Provides logging capabilities for applications"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "files": [
@@ -1114,9 +1115,9 @@
             "homepage": "https://spitfirephp.com",
             "support": {
                 "issues": "https://github.com/Csardelacal/SpitfireEngine/issues",
-                "source": "https://github.com/Csardelacal/SpitfireEngine/tree/dev/attributes"
+                "source": "https://github.com/Csardelacal/SpitfireEngine/tree/master"
             },
-            "time": "2022-07-13T10:13:46+00:00"
+            "time": "2022-07-14T00:04:49+00:00"
         },
         {
             "name": "spitfire/event",
